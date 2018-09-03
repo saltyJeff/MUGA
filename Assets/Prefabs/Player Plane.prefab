@@ -216,9 +216,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dce134adb182cf24b9abcfba822b4cca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxClientSampleRate: 35
-  lerpAmt: 0.1
-  timeSim: 0
+  maxClientSampleRate: 60
+  lerpDelay: 0.1
   rocketSpawnPos: {fileID: 4591718682472138}
   lastFire: 0
 --- !u!114 &114701425655276516

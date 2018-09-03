@@ -970,7 +970,7 @@ MonoBehaviour:
   m_Channels: 050000000000000001000000
   m_UseWebSockets: 0
   m_UseSimulator: 1
-  m_SimulatedLatency: 80
+  m_SimulatedLatency: 100
   m_PacketLossPercentage: 0
   m_MaxBufferedPackets: 16
   m_AllowFragmentation: 1
@@ -991,7 +991,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: af08b223ce6c36b43b98f8ec9e1c155b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  samplesPerSecond: 15
+  samplesPerSecond: 20
   maxAcceptableLag: 1
   boxPoolStartAmount: 5
   capsulePoolStartAmount: 5
@@ -1018,7 +1018,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 44c9a84d872b59143984c1426bce07b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interpBufferSize: 6
   offServerTime: 0
 --- !u!4 &1715748105
 Transform:

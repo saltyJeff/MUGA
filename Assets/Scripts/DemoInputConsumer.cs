@@ -12,7 +12,7 @@ public class DemoInputConsumer : InputConsumer {
 	public float rocketSpeed = 18;
 
 	//Process incoming input snapshots
-	public override void ConsumeInput(int connectionId, InputSnapshot input) {
+	public override void ConsumeInput(int connectionId, InputSnapshot input, bool firstExec) {
 		//objsOwned will either be empty (we return) or contain our plane
 		List<GameObject> objsOwned = Ownerships.GetOwnedObjs(connectionId);
 		if(objsOwned.Count == 0) {

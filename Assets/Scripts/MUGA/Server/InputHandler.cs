@@ -17,7 +17,7 @@ namespace MUGA.Server {
 		}
 		public void HandleInput(NetworkMessage msg) {
 			InputSnapshot snapshot = MessagePackSerializer.Deserialize<InputSnapshot>(msg.ReadMessage<ByteMsgBase>().payload); //super sus
-			inputConsumer.ConsumeInput(msg.conn.connectionId, snapshot);
+			inputConsumer.ConsumeInput(msg.conn.connectionId, snapshot, false);
 		}
 	}
 }

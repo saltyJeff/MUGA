@@ -12,62 +12,90 @@ namespace MUGA.Client {
 	/// <seealso cref="MUGA.Client.IInterpolator" />
 	class BasicInterpolator : MonoBehaviour, IInterpolator {
 		private Queue<InterpolateStep> steps = new Queue<InterpolateStep>();
-		private InterpolateStep currentStep;
-		public float lerpAmt;
+		private Queue<InterpolateStep> completeSteps = new Queue<InterpolateStep>();
+
+		public float lerpDelay = 0.2f;
+
+		private InterpolateStep from;
+		private InterpolateStep to;
+		public long interpTime;
+
 		private void Start() {
 			enabled = MUGAClient.isClient;
+			Debug.Log(lerpDelay);
 		}
 		public void AcceptState(InterpolateStep step) {
-			if(steps.Count > 0 && step.timestamp < steps.Peek().timestamp) {
-				//throwaway out-of-order messages
+			/*if(steps.Count > 0 && step.timestamp < steps.Peek().timestamp) {
+				//throw away out-of-order messages
 				return;
-			}
+			}*/
 			steps.Enqueue(step);
+			completeSteps.Enqueue(step);
 		}
 		private void Update() {
 			if (steps.Count == 0) {
 				return;
 			}
-			if (currentStep == null) {
-				currentStep = steps.Dequeue();
-				currentStep.profile.RestoreSelfToGameObject(this.gameObject);
+			interpTime = (long)(Utils.Timestamp - (lerpDelay * Utils.TICKS_PER_SEC));
+			from = GetFromStep();
+			to = GetToStep();
+
+			if (to != null && from != null) {
+				double lerpVal = (interpTime - from.timestamp) / (to.timestamp - from.timestamp);
+				LerpAllTheThings(from.profile, to.profile, (float)lerpVal);
 			}
 			else {
-				InterpolateStep nextStep = steps.Peek();
-				lerpAmt = (nextStep.timestamp - (Utils.Timestamp - MUGAClient.interpTime)) / MUGAClient.interpTime;
-				//0 lerpAmt = nextStep, 1 = currentStep) it's kinda flipped
-				LerpAllTheThings(nextStep.profile, lerpAmt);
-				if(lerpAmt < 0) {
-					//other non-lerpable things that may have changed
-					tag = nextStep.profile.tag;
-					gameObject.layer = nextStep.profile.layer;
+				Debug.Log(to != null ? "Missing the future step" : "Missing the past step");
+			}
 
-					currentStep = steps.Dequeue();
-
-					if(steps.Count == 0) {
-						return;
-					}
-					//if the lerp is negative then we should proabably skip over to the next one
-					nextStep = steps.Peek();
-					
-					LerpAllTheThings(nextStep.profile, 1.0f+lerpAmt);
+		}
+		private InterpolateStep GetFromStep() {
+			if(steps.Count < 2) {
+				return null;
+			}
+			InterpolateStep toReturn = null;
+			InterpolateStep afterToReturn = steps.Peek();
+			while(true) {
+				if(afterToReturn.timestamp > interpTime) {
+					break;
+				}
+				toReturn = steps.Dequeue();
+				if(steps.Count > 0) {
+					afterToReturn = steps.Peek();
+				}
+				else {
+					break;
+				}
+			}
+			return toReturn;
+		}
+		private InterpolateStep GetToStep() {
+			if(steps.Count < 1) {
+				return null;
+			}
+			return steps.Peek();
+		}
+		private void OnDrawGizmos() {
+			Gizmos.color = Color.green;
+			foreach (InterpolateStep step in completeSteps) {
+				if(step == from) {
+					Gizmos.color = Color.red;
+					Gizmos.DrawWireCube(step.profile.position, Vector3.one);
+				}
+				else if(step == to) {
+					Gizmos.color = Color.blue;
+					Gizmos.DrawWireCube(step.profile.position, Vector3.one);
+				}
+				else {
+					Gizmos.color = Color.white;
 				}
 			}
 		}
-		private void OnDrawGizmos() {
-			foreach (InterpolateStep step in steps) {
-				Gizmos.DrawWireCube(step.profile.position, Vector3.one);
-			}
-		}
-		/// <summary>
-		/// Lerps transform position, rotation, and scale
-		/// </summary>
-		/// <param name="prof">The profile to lerp from</param>
-		/// <param name="lerpAmt">The lerp amount (0 = profile position and 1 = currentStep)</param>
-		public void LerpAllTheThings(TransformProfile prof, float lerpAmt) {
-			transform.position = Vector3.Lerp(prof.position, currentStep.profile.position, lerpAmt);
-			transform.rotation = Quaternion.Lerp(prof.rotation, currentStep.profile.rotation, lerpAmt);
-			transform.localScale = Vector3.Lerp(prof.localScale, currentStep.profile.localScale, lerpAmt);
+
+		private void LerpAllTheThings(TransformProfile from, TransformProfile to, float lerpAmt) {
+			transform.position = Vector3.Lerp(from.position, to.position, lerpAmt);
+			transform.rotation = Quaternion.Lerp(from.rotation, to.rotation, lerpAmt);
+			transform.localScale = Vector3.Lerp(from.localScale, to.localScale, lerpAmt);
 		}
 	}
 }

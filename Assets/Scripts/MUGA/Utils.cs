@@ -1,4 +1,5 @@
 ﻿using MessagePack;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,7 +13,7 @@ namespace MUGA {
 		/// <summary>
 		/// The ticks per sec
 		/// </summary>
-		public const long TICKS_PER_SEC = 10000000;
+		public const long TICKS_PER_SEC = TimeSpan.TicksPerSecond;
 		/// <summary>
 		/// Gets the timestamp in C# Ticks.
 		/// </summary>
@@ -21,7 +22,7 @@ namespace MUGA {
 		/// </value>
 		public static long Timestamp {
 			get {
-				return System.DateTimeOffset.UtcNow.Ticks;
+				return DateTimeOffset.UtcNow.Ticks;
 			}
 		}
 	}

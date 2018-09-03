@@ -24,9 +24,7 @@ namespace MUGA.Client {
 		public static MUGAClient inst;
 
 		//interpolation handling
-		public int interpBufferSize = 3;
 		private Dictionary<uint, IInterpolator> interpolatorHandlers = new Dictionary<uint, IInterpolator>();
-		public static float interpTime = -1; //negative = not intialized yet
 		public float offServerTime;
 
 		public NetworkClient client;
@@ -68,11 +66,6 @@ namespace MUGA.Client {
 					interpolatorHandlers[pair.Key] = component;
 				}
 				interpolator.AcceptState(new InterpolateStep(pair.Value, snapshot.timestamp));
-			}
-
-			if(interpTime < 0) {
-				interpTime = LCPhysics.GetTicksPerSample() * interpBufferSize;
-				Debug.Log("interpolation time:  "+interpTime / Utils.TICKS_PER_SEC);
 			}
 		}
 

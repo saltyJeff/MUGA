@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine.Networking;
 using UnityEngine;
+using MUGA.Server;
 
 namespace MUGA.Client {
 	/// <summary>
@@ -18,12 +19,9 @@ namespace MUGA.Client {
 		private long ticksPerSend;
 		private Queue<InputSnapshot> previousInputs = new Queue<InputSnapshot>();
 
-		public float lerpAmt = 0.1f;
-		private TransformProfile goal;
-
 		private InterpolateStep lastTruth;
-		public float timeSim;
 
+		public float knownLag;
 		public void AcceptState(InterpolateStep step) {
 			if(lastTruth != null && step.timestamp < lastTruth.timestamp) {
 				//throwaway out-of-order messages
@@ -31,18 +29,18 @@ namespace MUGA.Client {
 			}
 			long now = Utils.Timestamp;
 			lastTruth = step;
-			//hold the old state
-			TransformProfile start = new TransformProfile(this.gameObject);
 			//new step is the truth
 			lastTruth.profile.RestoreSelfToGameObject(gameObject);
+			float lastKnownTime = lastTruth.timestamp;
 
-			if(previousInputs.Count < 1) {
-				Debug.Log("no saved inputs");
+			knownLag = (now - lastKnownTime) / Utils.TICKS_PER_SEC;
+			if (previousInputs.Count < 1) {
+				//Debug.Log("no saved inputs");
 				return;
 			}
 			//deque all the ones older than this step
 			InputSnapshot snap = previousInputs.Peek();
-			while(snap.timeSent < step.timestamp) {
+			while(snap != null && snap.timeSent < lastKnownTime) {
 				previousInputs.Dequeue();
 				if(previousInputs.Count < 1) {
 					break;
@@ -53,20 +51,14 @@ namespace MUGA.Client {
 			//for the rest use physics magikery to simulate everything
 			Physics.autoSimulation = false;
 
-			timeSim = 0;
 			//for each step simulate the futures
 			foreach(InputSnapshot futureSnap in previousInputs) {
 				//simulate teh future
-				InputConsumer.inst.ConsumeInput(-1, futureSnap);
-				Physics.Simulate((float)ticksPerSend / Utils.TICKS_PER_SEC);
-				timeSim += (float)ticksPerSend / Utils.TICKS_PER_SEC;
+				InputConsumer.inst.ConsumeInput(-1, futureSnap, false);
+				Debug.Log(futureSnap.timeSent - lastKnownTime);
+				Physics.Simulate((futureSnap.timeSent - lastKnownTime) / Utils.TICKS_PER_SEC);
+				lastKnownTime = futureSnap.timeSent;
 			}
-
-			//save the new state as goal
-			goal = new TransformProfile(this.gameObject);
-
-			//restore the old state
-			start.RestoreSelfToGameObject(this.gameObject);
 
 			Physics.autoSimulation = true;
 		}
@@ -82,23 +74,16 @@ namespace MUGA.Client {
 				lastSend = currentTime;
 				InputSnapshot snapshot = TakeInputSnapshot();
 				previousInputs.Enqueue(snapshot);
+				InputConsumer.inst.ConsumeInput(-1, snapshot, true);
 				MUGAClient.inst.client.SendByChannel(
 					MsgTypeExt.USER_INPUT, 
 					new ByteMsgBase(snapshot.ToBytes()), 
 					Channels.DefaultUnreliable);
 			}
-			//attempt to "smooth" any prediction error
-			if(goal != null) {
-				transform.position = Vector3.Lerp(goal.position, transform.position, lerpAmt);
-				transform.rotation = Quaternion.Lerp(goal.rotation, transform.rotation, lerpAmt);
-				transform.localScale = Vector3.Lerp(goal.localScale, transform.localScale, lerpAmt);
-			}
 		}
 		private void OnDrawGizmos() {
-			if(goal != null) {
-				Gizmos.color = Color.blue;
-				Gizmos.DrawSphere(goal.position, 1);
-			}
+			Gizmos.color = Color.blue;
+			Gizmos.DrawSphere(transform.position, 2);
 			if(lastTruth != null) {
 				Gizmos.color = Color.red;
 				Gizmos.DrawSphere(lastTruth.profile.position, 2);

@@ -13,7 +13,13 @@ namespace MUGA {
 		private void Awake() {
 			inst = this;
 		}
-		// connectionId of -1 means executing locally
-		public abstract void ConsumeInput(int connectionId, InputSnapshot input);
+		// connectionId of -1 means executing locally		
+		/// <summary>
+		/// Consumes input snapshots on the client and the server
+		/// </summary>
+		/// <param name="connectionId">The connection identifier. -1 means executing locally</param>
+		/// <param name="input">The input snapshot</param>
+		/// <param name="firstExec">if set to <c>true</c> [the client is executing this for the first time].</param>
+		public abstract void ConsumeInput(int connectionId, InputSnapshot input, bool firstExec);
 	}
 }
