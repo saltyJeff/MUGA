@@ -31,7 +31,7 @@ namespace MUGA.Client {
 			lastTruth = step;
 			//new step is the truth
 			lastTruth.profile.RestoreSelfToGameObject(gameObject);
-			float lastKnownTime = lastTruth.timestamp;
+			long lastKnownTime = lastTruth.timestamp;
 
 			knownLag = (now - lastKnownTime) / Utils.TICKS_PER_SEC;
 			if (previousInputs.Count < 1) {
@@ -55,8 +55,8 @@ namespace MUGA.Client {
 			foreach(InputSnapshot futureSnap in previousInputs) {
 				//simulate teh future
 				InputConsumer.inst.ConsumeInput(-1, futureSnap, false);
-				Debug.Log(futureSnap.timeSent - lastKnownTime);
-				Physics.Simulate((futureSnap.timeSent - lastKnownTime) / Utils.TICKS_PER_SEC);
+				Debug.Log(((float)futureSnap.timeSent - lastKnownTime) / Utils.TICKS_PER_SEC);
+				Physics.Simulate((float)(futureSnap.timeSent - lastKnownTime) / Utils.TICKS_PER_SEC);
 				lastKnownTime = futureSnap.timeSent;
 			}
 

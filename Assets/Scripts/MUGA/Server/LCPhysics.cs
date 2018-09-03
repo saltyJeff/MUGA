@@ -100,7 +100,7 @@ namespace MUGA.Server {
 				OnPhysicsTick(startTime, snapShotter.GetGameObjectSnapshot(snapShotter.currentSnapshot));
 				long endTime = Utils.Timestamp;
 				float secsToSpare = ((float)ticksPerSample - (endTime - startTime)) / Utils.TICKS_PER_SEC;
-				if (ticksPerSample <= 0) {
+				if (secsToSpare <= 0) {
 					Debug.LogWarning("tick " + snapShotter.currentSnapshot + " took too long by " + (secsToSpare * -1000) + " ms");
 				}
 				yield return new WaitForSecondsRealtime(secsToSpare);

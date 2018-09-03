@@ -20,6 +20,8 @@ namespace MUGA.Client {
 		private InterpolateStep to;
 		public long interpTime;
 
+		public float offServerTime;
+
 		private void Start() {
 			enabled = MUGAClient.isClient;
 			Debug.Log(lerpDelay);
@@ -31,6 +33,8 @@ namespace MUGA.Client {
 			}*/
 			steps.Enqueue(step);
 			completeSteps.Enqueue(step);
+			offServerTime = (float)(Utils.Timestamp - step.timestamp) / Utils.TICKS_PER_SEC;
+			Debug.Log("PARSE TIME: " + offServerTime);
 		}
 		private void Update() {
 			if (steps.Count == 0) {
@@ -45,7 +49,7 @@ namespace MUGA.Client {
 				LerpAllTheThings(from.profile, to.profile, (float)lerpVal);
 			}
 			else {
-				Debug.Log(to != null ? "Missing the future step" : "Missing the past step");
+				//Debug.Log(to != null ? "Missing the future step" : "Missing the past step");
 			}
 
 		}

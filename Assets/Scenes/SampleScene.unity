@@ -970,7 +970,7 @@ MonoBehaviour:
   m_Channels: 050000000000000001000000
   m_UseWebSockets: 0
   m_UseSimulator: 1
-  m_SimulatedLatency: 100
+  m_SimulatedLatency: 57
   m_PacketLossPercentage: 0
   m_MaxBufferedPackets: 16
   m_AllowFragmentation: 1
@@ -993,9 +993,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   samplesPerSecond: 20
   maxAcceptableLag: 1
-  boxPoolStartAmount: 5
-  capsulePoolStartAmount: 5
-  spherePoolStartAmount: 5
+  boxPoolStartAmount: 1
+  capsulePoolStartAmount: 1
+  spherePoolStartAmount: 1
 --- !u!114 &1715748103
 MonoBehaviour:
   m_ObjectHideFlags: 0
