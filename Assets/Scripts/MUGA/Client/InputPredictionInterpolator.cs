@@ -55,7 +55,6 @@ namespace MUGA.Client {
 			foreach(InputSnapshot futureSnap in previousInputs) {
 				//simulate teh future
 				InputConsumer.inst.ConsumeInput(-1, futureSnap, false);
-				Debug.Log(((float)futureSnap.timeSent - lastKnownTime) / Utils.TICKS_PER_SEC);
 				Physics.Simulate((float)(futureSnap.timeSent - lastKnownTime) / Utils.TICKS_PER_SEC);
 				lastKnownTime = futureSnap.timeSent;
 			}

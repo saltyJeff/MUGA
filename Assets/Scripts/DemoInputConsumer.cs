@@ -8,8 +8,10 @@ using UnityEngine.Networking;
 public class DemoInputConsumer : InputConsumer {
 	public float speed = 4;
 	public GameObject rocketPrefab;
-	public float rocketFireRate = 0.33f;
+	public float rocketFireRate = 0.66f;
 	public float rocketSpeed = 18;
+
+	public float laserFireRate = 0.33f;
 
 	//Process incoming input snapshots
 	public override void ConsumeInput(int connectionId, InputSnapshot input, bool firstExec) {
@@ -40,7 +42,7 @@ public class DemoInputConsumer : InputConsumer {
 		 * If you want to use time that will be sync'd between client and server, use
 		 * Utils.Timestamp in the MUGA package which will fetch the OS time
 		 */
-		if (input.GetButton("Fire1") && Time.time > inputPrediction.lastFire + rocketFireRate) {
+		if (input.GetButton("Fire1") && Time.time > inputPrediction.lastRocketFire + rocketFireRate) {
 			//get rocket spawn position and spawn it
 			Vector3 rocketLocation = inputPrediction.rocketSpawnPos.position;
 			GameObject newRocket = Instantiate(rocketPrefab, rocketLocation, Quaternion.identity);
@@ -51,7 +53,24 @@ public class DemoInputConsumer : InputConsumer {
 			NetworkServer.Spawn(newRocket);
 
 			//Reset the fire rate limiter
-			inputPrediction.lastFire = Time.time;
+			inputPrediction.lastRocketFire = Time.time;
+		}
+		if(input.GetButton("Fire2") && Time.time > inputPrediction.lastLaserFire + laserFireRate) {
+			//get rocket spawn position and spawn it
+			Vector3 rocketLocation = inputPrediction.rocketSpawnPos.position;
+			//get an instance of "Restorer" to represent the past state
+			using(Restorer rest = LCPhysics.GetRestorer(input.timeSent)) {
+				RaycastHit hit;
+				if(Physics.Raycast(rocketLocation, myPlane.transform.forward, out hit)) {
+					if(hit.collider.tag == "Player") {
+						hit.collider.GetComponentInParent<PlaneHP>().hp -= 4;
+					}
+					Debug.Log("LC hit " + hit.collider.tag);
+				}
+			}
+			
+			//Reset the fire rate limiter
+			inputPrediction.lastLaserFire = Time.time;
 		}
 	}
 }

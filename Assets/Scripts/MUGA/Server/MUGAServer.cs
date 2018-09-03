@@ -59,7 +59,6 @@ namespace MUGA.Server {
 
 			StateUpdate update = new StateUpdate(sampleTimestamp, snapshot, absoluteNotDelta);
 			NetworkServer.SendByChannelToAll(MsgTypeExt.STATE_UPDATE, new ByteMsgBase(update.ToBytes()), DefaultChannelExt.DEFAULT_FRAG_UNRELIABLE);
-			Debug.Log("PHYSICS LATENCY: " + (float)(Utils.Timestamp - sampleTimestamp) / Utils.TICKS_PER_SEC);
 		}
 
 		/// <summary>

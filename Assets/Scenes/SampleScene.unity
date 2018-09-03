@@ -1048,3 +1048,4 @@ MonoBehaviour:
     type: 2}
   rocketFireRate: 0.33
   rocketSpeed: 18
+  laserFireRate: 0.33

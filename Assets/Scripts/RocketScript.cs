@@ -34,5 +34,8 @@ public class RocketScript : MonoBehaviour {
 			NetworkServer.Destroy(collision.gameObject);
 			NetworkServer.Destroy(gameObject);
 		}
+		else if(collision.collider.tag == "Player") {
+			collision.collider.GetComponentInParent<PlaneHP>().hp -= 5;
+		}
 	}
 }

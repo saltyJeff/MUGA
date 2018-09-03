@@ -12,7 +12,6 @@ namespace MUGA.Client {
 	/// <seealso cref="MUGA.Client.IInterpolator" />
 	class BasicInterpolator : MonoBehaviour, IInterpolator {
 		private Queue<InterpolateStep> steps = new Queue<InterpolateStep>();
-		private Queue<InterpolateStep> completeSteps = new Queue<InterpolateStep>();
 
 		public float lerpDelay = 0.2f;
 
@@ -32,9 +31,7 @@ namespace MUGA.Client {
 				return;
 			}*/
 			steps.Enqueue(step);
-			completeSteps.Enqueue(step);
 			offServerTime = (float)(Utils.Timestamp - step.timestamp) / Utils.TICKS_PER_SEC;
-			Debug.Log("PARSE TIME: " + offServerTime);
 		}
 		private void Update() {
 			if (steps.Count == 0) {
@@ -80,19 +77,13 @@ namespace MUGA.Client {
 			return steps.Peek();
 		}
 		private void OnDrawGizmos() {
-			Gizmos.color = Color.green;
-			foreach (InterpolateStep step in completeSteps) {
-				if(step == from) {
-					Gizmos.color = Color.red;
-					Gizmos.DrawWireCube(step.profile.position, Vector3.one);
-				}
-				else if(step == to) {
-					Gizmos.color = Color.blue;
-					Gizmos.DrawWireCube(step.profile.position, Vector3.one);
-				}
-				else {
-					Gizmos.color = Color.white;
-				}
+			if(from != null) {
+				Gizmos.color = Color.red;
+				Gizmos.DrawWireCube(from.profile.position, Vector3.one);
+			}
+			if(to != null) {
+				Gizmos.color = Color.red;
+				Gizmos.DrawWireCube(to.profile.position, Vector3.one);
 			}
 		}
 
