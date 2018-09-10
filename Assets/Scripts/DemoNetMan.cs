@@ -27,6 +27,8 @@ public class DemoNetMan : NetworkManager {
 		//instantiate the player using the custom MUGA ownership system
 		GameObject newPlayerObj = Instantiate(playerPrefab, GetStartPosition().position, Quaternion.identity);
 		MUGAServer.inst.Spawn(conn.connectionId, newPlayerObj);
+		//set the name of the object to the connId for EZ lookups
+		newPlayerObj.name = conn.connectionId+"";
 	}
 	public override void OnServerDisconnect(NetworkConnection conn) {
 		base.OnServerDisconnect(conn);

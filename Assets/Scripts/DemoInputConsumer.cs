@@ -47,6 +47,7 @@ public class DemoInputConsumer : InputConsumer {
 			Vector3 rocketLocation = inputPrediction.rocketSpawnPos.position;
 			GameObject newRocket = Instantiate(rocketPrefab, rocketLocation, Quaternion.identity);
 			newRocket.transform.forward = myPlane.transform.forward;
+
 			newRocket.GetComponent<Rigidbody>().velocity = myPlane.transform.forward * rocketSpeed;
 
 			//Notify clients of the rocket
@@ -63,7 +64,8 @@ public class DemoInputConsumer : InputConsumer {
 				RaycastHit hit;
 				if(Physics.Raycast(rocketLocation, myPlane.transform.forward, out hit)) {
 					if(hit.collider.tag == "Player") {
-						hit.collider.GetComponentInParent<PlaneHP>().hp -= 4;
+						GameObject enemy = Ownerships.GetOwnedObjs(int.Parse(hit.collider.name))[0];
+						enemy.GetComponent<PlaneHP>().hp -= 4;
 					}
 					Debug.Log("LC hit " + hit.collider.tag);
 				}

@@ -58,6 +58,7 @@ namespace MUGA.Server {
 		public void Dispose() {
 			boxPool.ClearPool();
 			capsulePool.ClearPool();
+			spherePool.ClearPool();
 			//restore all the realtime colliders
 			foreach (NetworkTransform trans in SnapShotter.objectsToWatch) {
 				trans.SetCollidersEnabled(true);

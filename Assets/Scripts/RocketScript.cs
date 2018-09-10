@@ -25,7 +25,12 @@ public class RocketScript : MonoBehaviour {
 	}
 
 	private void OnCollisionEnter(Collision collision) {
+		//we ignore collision events if we are on the client since only the server can detract HP
+		if(MUGAClient.isClient) {
+			return;
+		}
 		//destroy self if hit wall
+		Debug.Log("hit " + collision.collider.name);
 		if(collision.collider.tag == "Wall") {
 			NetworkServer.Destroy(gameObject);
 		}
